@@ -1,0 +1,10 @@
+[submodule "linux"]
+	path = linux
+	url = https://github.com/torvalds/linux.git
+	branch = master
+    shallow = true
+[submodule "toybox"]
+	path = toybox
+	url = https://github.com/landley/toybox.git
+	branch = master
+    shallow = true
