@@ -3,13 +3,16 @@
 	url = https://github.com/torvalds/linux.git
 	branch = master
     shallow = true
+    ignore = all
 [submodule "coreutils"]
 	path = coreutils
 	url = https://github.com/coreutils/coreutils.git
 	branch = master
     shallow = true
+    ignore = all
 [submodule "bash"]
 	path = bash
 	url = https://git.savannah.gnu.org/git/bash.git
 	branch = master
     shallow = true
+    ignore = all
