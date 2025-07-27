@@ -1,10 +1,10 @@
 SHELL := /bin/bash
-BUILD_DIR := distro
+BUILD_DIR := $(shell pwd)/distro
 ROOT := $(BUILD_DIR)/rootfs
 
-.PHONY: all setup minkernel
+.PHONY: all setup minkernel bash
 
-all: setup minkernel
+all: setup minkernel bash
 
 setup:
 	mkdir -p $(ROOT)/{boot,proc,sys,dev,usr/{bin,sbin,lib,lib64}}
@@ -18,7 +18,12 @@ minkernel: setup
 	make -C linux -j$(shell nproc)
 	cp linux/arch/x86_64/boot/bzImage $(ROOT)/boot/
 
+bash:
+	cd bash/ && ./configure --prefix=/usr
+	make -C bash -j$(shell nproc) DESTDIR=$(ROOT) install
+	ln -sr $(ROOT)/usr/bin/bash $(ROOT)/usr/bin/sh
 
 clean:
 	rm -rf $(BUILD_DIR)
 	make -C linux clean
+	make -C bash clean
