@@ -12,7 +12,8 @@ RUN apt update && apt install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY Makefile Makefile
-COPY busybox busybox
-COPY linux linux
+
+RUN git clone --depth=1 https://github.com/torvalds/linux.git
+RUN git clone --depth=1 https://git.busybox.net/busybox
 
 CMD ["make", "all"]
