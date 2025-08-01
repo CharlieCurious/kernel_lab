@@ -4,30 +4,6 @@
 	branch = master
     shallow = true
     ignore = all
-[submodule "coreutils"]
-	path = coreutils
-	url = https://github.com/coreutils/coreutils.git
-	branch = master
-    shallow = true
-    ignore = all
-[submodule "bash"]
-	path = bash
-	url = https://git.savannah.gnu.org/git/bash.git
-	branch = master
-    shallow = true
-    ignore = all
-[submodule "util-linux"]
-	path = util-linux
-	url = https://github.com/util-linux/util-linux.git
-	branch = master
-    shallow = true
-    ignore = all
-[submodule "glibc"]
-	path = glibc
-	url = https://sourceware.org/git/glibc
-	branch = master
-    shallow = true
-    ignore = all
 [submodule "busybox"]
 	path = busybox
 	url = https://git.busybox.net/busybox

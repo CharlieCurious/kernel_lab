@@ -1,47 +1,39 @@
-SHELL := /bin/bash
-BUILD_DIR := $(shell pwd)/distro
-ROOT := $(BUILD_DIR)/rootfs
+SHELL := bash
+BUILD_DIR := $(shell pwd)
+BOOT_DIR := "$(BUILD_DIR)"/boot-files
+INITRAMFS_DIR := "$(BUILD_DIR)"/initramfs
 
-.PHONY: all setup linux bash coreutils glibc cpio
+.PHONY: all setup kernel busybox initramfs clean
 
-all: setup linux bash coreutils cpio
+all: kernel busybox initramfs
 
 setup:
-	mkdir -p $(ROOT)/{boot,proc,sys,dev,usr/{bin,sbin,lib,lib64}}
-	ln -sr $(ROOT)/usr/bin $(ROOT)/bin
-	ln -sr $(ROOT)/usr/sbin $(ROOT)/sbin
-	ln -sr $(ROOT)/usr/lib $(ROOT)/lib
-	ln -sr $(ROOT)/usr/lib64 $(ROOT)/lib64
+	mkdir -p "$(BUILD_DIR)"/boot-files
 
-linux:
-	make -C linux -j$(shell nproc)
-	cp linux/arch/x86/boot/bzImage $(ROOT)/boot/
+kernel: setup
+	make -C linux debug.config
+	make -C linux -j $(shell nproc)
+	cp linux/arch/x86/boot/bzImage $(BOOT_DIR)
 
-bash:
-	cd bash/ && ./configure --prefix=/usr --enable-static-link
-	make -C  bash -j$(shell nproc)
-	make -C bash DESTDIR=$(ROOT) install
-	ln -sr $(ROOT)/usr/bin/bash $(ROOT)/usr/bin/sh
+busybox: busybox/.config
+	make -C busybox -j $(shell nproc)
+	make -C busybox CONFIG_PREFIX=$(INITRAMFS_DIR) install
+	cd $(INITRAMFS_DIR) && rm linuxrc
 
-coreutils:
-	cd coreutils && ./bootstrap
-	cd coreutils && ./configure --prefix=/usr CFLAGS="-static -O2" LDFLAGS="-static" --disable-nls
-	make -C coreutils -j$(shell nproc)
-	make -C coreutils DESTDIR=$(ROOT) install
+busybox/.config:
+	make -C busybox defconfig
+	cd busybox && sed -i 's/^CONFIG_TC=y/# CONFIG_TC is not set/' .config
+	cd busybox && sed -i 's/^# CONFIG_STATIC is not set/CONFIG_STATIC=y/' .config
 
-glibc:
-	mkdir -p glibc/glibc-build
-	cd glibc/glibc-build && ../configure --libdir=/lib --prefix=/usr
-	make -C glibc/glibc-build -j$(shell nproc)
-	make -C glibc/glibc-build DESTDIR=$(ROOT) install
+initramfs: $(INITRAMFS_DIR)/init setup
+	cd $(BUILD_DIR)/initramfs && find . -print0 | cpio --null -ov -H newc | gzip -9 > $(BOOT_DIR)/init.cpio.gz
 
-cpio:
-	ln -sfr $(ROOT)/usr/bin/bash $(ROOT)/init
-	cd distro/rootfs && find . -print0 | cpio --null -ov --format=newc | gzip -9 > ../init.cpio.gz
+$(INITRAMFS_DIR)/init:
+	mkdir -p $(INITRAMFS_DIR)
+	printf '#!/bin/sh\n\n/bin/sh\n' > "$@"
+	chmod +x "$@"
 
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(BOOT_DIR) $(INITRAMFS_DIR)
 	make -C linux clean
-	make -C bash clean
-	make -C coreutils distclean || true
-	rm -rf glibc/glibc-build
+	make -C busybox clean
