@@ -22,3 +22,15 @@
 	branch = master
     shallow = true
     ignore = all
+[submodule "glibc"]
+	path = glibc
+	url = https://sourceware.org/git/glibc
+	branch = master
+    shallow = true
+    ignore = all
+[submodule "busybox"]
+	path = busybox
+	url = https://git.busybox.net/busybox
+	branch = master
+    shallow = true
+    ignore = all
