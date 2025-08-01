@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:latest as builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -16,4 +16,9 @@ COPY Makefile Makefile
 RUN git clone --depth=1 https://github.com/torvalds/linux.git
 RUN git clone --depth=1 https://git.busybox.net/busybox
 
-CMD ["make", "all"]
+RUN make all
+
+FROM alpine:latest AS runtime
+
+COPY --from=builder boot-files/bzImage .
+COPY --from=builder boot-files/init.cpio.gz .
