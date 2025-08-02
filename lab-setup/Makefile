@@ -5,7 +5,7 @@ INITRAMFS_DIR := "$(BUILD_DIR)"/initramfs
 
 .PHONY: all setup kernel busybox initramfs clean
 
-all: kernel busybox initramfs
+all: kernel busybox
 
 setup:
 	mkdir -p "$(BUILD_DIR)"/boot-files

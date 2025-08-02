@@ -13,12 +13,5 @@ RUN apt update && apt install -y \
 
 COPY Makefile Makefile
 
-RUN git clone --depth=1 https://github.com/torvalds/linux.git
-RUN git clone --depth=1 https://git.busybox.net/busybox
-
-RUN make all
-
-FROM alpine:latest AS runtime
-
-COPY --from=builder boot-files/bzImage .
-COPY --from=builder boot-files/init.cpio.gz .
+RUN git clone --depth=1 --branch=master https://github.com/torvalds/linux.git
+RUN git clone --depth=1 --branch=master https://git.busybox.net/busybox
