@@ -1,4 +1,4 @@
-FROM ubuntu:latest as builder
+FROM ubuntu:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -10,6 +10,8 @@ RUN apt update && apt install -y \
     git vim \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
 
 COPY Makefile Makefile
 
